@@ -292,6 +292,7 @@ class LanguageTool:
         root = cls._get_root(cls._url, data, num_tries=1)
         return root.attrib
 
+    # patch from https://github.com/myint/language-check/issues/16
     @classmethod
     def _get_root(cls, url, data=None, num_tries=2):
         for n in range(num_tries):
@@ -300,6 +301,7 @@ class LanguageTool:
                     return ElementTree.parse(f).getroot()
             except (IOError, http.client.HTTPException) as e:
                 cls._terminate_server()
+                import time; time.sleep(5) # wait for a while for the server to properly terminate
                 cls._start_server()
                 if n + 1 >= num_tries:
                     raise Error('{}: {}'.format(cls._url, e))
